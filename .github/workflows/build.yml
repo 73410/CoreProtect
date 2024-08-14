@@ -1,6 +1,10 @@
 name: Build
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
 jobs:
   build:
     name: Build
@@ -15,7 +19,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
       - name: Cache Maven packages
-        uses: actions/cache@v1
+        uses: actions/cache@v3  # Updated to v3 to use the latest Node.js version
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -23,10 +27,9 @@ jobs:
       - name: Build
         run: mvn -B verify
 
-      # New step to upload artifacts
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # Updated to v4 to use the latest Node.js version
         with:
           name: build-artifacts
           path: |
-            target/*.jar   # Adjust the path according to the output of your build
+            target/*.jar   # Ensure this path is correct according to your project structure
